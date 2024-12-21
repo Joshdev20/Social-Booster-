@@ -1,6 +1,6 @@
-// API URL and your API Key
+// Your API Key
 const apiKey = "c8245735c0229338246a2ba130666236";
-const apiUrl = "https://corsproxy.io/?https://reallysimplesocial.com/api/v2"; // Added CORS Proxy
+const apiUrl = "https://corsproxy.io/?https://reallysimplesocial.com/api/v2";
 
 // Helper function to make API requests
 const makeApiRequest = (data) => {
@@ -14,7 +14,9 @@ const makeApiRequest = (data) => {
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.text().then((text) => {
+          throw new Error(`HTTP error! Status: ${response.status}. Response: ${text}`);
+        });
       }
       return response.json();
     })
@@ -24,80 +26,21 @@ const makeApiRequest = (data) => {
     });
 };
 
-// Function to add an order
-const addOrder = (data) => {
-  const postData = { ...data, key: apiKey, action: "add" };
-  return makeApiRequest(postData);
-};
-
-// Function to check the status of an order
-const getOrderStatus = (orderId) => {
-  const postData = { key: apiKey, action: "status", order: orderId };
-  return makeApiRequest(postData);
-};
-
-// Function to check the status of multiple orders
-const getMultipleOrderStatus = (orderIds) => {
-  const postData = {
-    key: apiKey,
-    action: "status",
-    orders: orderIds.join(","),
-  };
-  return makeApiRequest(postData);
-};
-
-// Function to get available services
+// Fetch available services
 const getServices = () => {
   const postData = { key: apiKey, action: "services" };
   return makeApiRequest(postData);
 };
 
-// Function to refill an order
-const refillOrder = (orderId) => {
-  const postData = { key: apiKey, action: "refill", order: orderId };
-  return makeApiRequest(postData);
-};
-
-// Function to refill multiple orders
-const refillMultipleOrders = (orderIds) => {
-  const postData = {
-    key: apiKey,
-    action: "refill",
-    orders: orderIds.join(","),
-  };
-  return makeApiRequest(postData);
-};
-
-// Function to get the status of a refill order
-const getRefillStatus = (refillId) => {
-  const postData = { key: apiKey, action: "refill_status", refill: refillId };
-  return makeApiRequest(postData);
-};
-
-// Function to get the statuses of multiple refill orders
-const getMultipleRefillStatus = (refillIds) => {
-  const postData = {
-    key: apiKey,
-    action: "refill_status",
-    refills: refillIds.join(","),
-  };
-  return makeApiRequest(postData);
-};
-
-// Function to cancel orders
-const cancelOrders = (orderIds) => {
-  const postData = {
-    key: apiKey,
-    action: "cancel",
-    orders: orderIds.join(","),
-  };
-  return makeApiRequest(postData);
-};
-
-// Function to check the balance
-const getBalance = () => {
-  const postData = { key: apiKey, action: "balance" };
-  return makeApiRequest(postData);
+// Dynamically populate the services dropdown
+const populateServices = (services) => {
+  const serviceSelect = document.getElementById("service");
+  services.forEach((service) => {
+    const option = document.createElement("option");
+    option.value = service.id;
+    option.textContent = service.name;
+    serviceSelect.appendChild(option);
+  });
 };
 
 // Event listener for the form submission
@@ -116,7 +59,7 @@ document.getElementById("boostForm").addEventListener("submit", function (e) {
     quantity: quantity,
   };
 
-  // Add order
+  // Add order (existing code)
   addOrder(orderData)
     .then((response) => {
       document.getElementById("result").textContent = `Order Success: ${JSON.stringify(response, null, 2)}`;
@@ -126,18 +69,10 @@ document.getElementById("boostForm").addEventListener("submit", function (e) {
     });
 });
 
-// Example usage for other API functions
-
-// Get services
+// Initializing the page with services
 getServices()
-  .then((services) => {
-    console.log("Available Services:", services);
+  .then((response) => {
+    const services = response.services;
+    populateServices(services);
   })
   .catch((error) => console.error("Error fetching services:", error));
-
-// Get balance
-getBalance()
-  .then((balance) => {
-    console.log("Current Balance:", balance);
-  })
-  .catch((error) => console.error("Error fetching balance:", error));
