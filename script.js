@@ -1,6 +1,6 @@
-// Your API Key
+// API URL and your API Key
 const apiKey = "c8245735c0229338246a2ba130666236";
-const apiUrl = "https://reallysimplesocial.com/api/v2";
+const apiUrl = "https://cors-anywhere.herokuapp.com/https://reallysimplesocial.com/api/v2"; // Added CORS Proxy
 
 // Helper function to make API requests
 const makeApiRequest = (data) => {
