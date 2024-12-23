@@ -4,14 +4,16 @@ const apiUrl = "https://corsproxy.io/?https://reallysimplesocial.com/api/v2";
 
 // Helper function to make API requests
 const makeApiRequest = (data) => {
-  return fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(data),
-  })
+  return fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+            "Accept-Content":"*",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`,
+        },
+        mode:"crossorigin",
+        body: JSON.stringify(data),
+    })
     .then((response) => {
       if (!response.ok) {
         return response.text().then((text) => {
